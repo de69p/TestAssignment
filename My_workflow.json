@@ -1,0 +1,303 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "b628ebf2-1737-44d1-ba1a-fbb41227ddad",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1iMw70WQrUXUmRyvyj2r2xGMtyDLNqFt2C2y7_6fFMb8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "0d2c67ce-ab03-48b2-bfaa-50f9c24a6a60",
+      "name": "Get Rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        1960,
+        340
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "6ObYJ2xaPfnf8u8f",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "meta.linkedIn",
+              "value": "={{ $json.LinkedInHandle }}"
+            },
+            {
+              "name": "meta.row",
+              "value": "={{ $json.row_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cb53dd97-d467-4559-a6ea-7d906785650a",
+      "name": "Keep meta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        2120,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "={{ 'https://www.linkedin.com/company/' + $json.meta.linkedIn }}",
+        "responseFormat": "string",
+        "options": {
+          "followRedirect": true
+        }
+      },
+      "id": "4c145910-705c-48d5-9c23-b76c1d3fa56e",
+      "name": "Fetch LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        2280,
+        340
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "I6W0QGnaw2ndkptz",
+          "name": "Header Auth account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "extractionValues": {
+          "values": [
+            {
+              "key": "Company Name",
+              "cssSelector": "h1.top-card-layout__title"
+            },
+            {
+              "key": "Industry",
+              "cssSelector": "h2.top-card-layout__headline"
+            },
+            {
+              "key": "Location",
+              "cssSelector": "h3.top-card-layout__first-subline"
+            },
+            {
+              "key": "Website",
+              "cssSelector": "div[data-test-id=\"about-us__website\"] a"
+            },
+            {
+              "key": "Company Size",
+              "cssSelector": "div[data-test-id=\"about-us__size\"] dd"
+            },
+            {
+              "key": "Specialties",
+              "cssSelector": "div[data-test-id=\"about-us__specialties\"] dd"
+            },
+            {
+              "key": "Headquarters",
+              "cssSelector": "div[data-test-id=\"about-us__headquarters\"] dd"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ea0e16b2-3847-4adb-b90c-2ad33517577f",
+      "name": "Extract Data",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        2420,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1iMw70WQrUXUmRyvyj2r2xGMtyDLNqFt2C2y7_6fFMb8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "dataMode": "autoMapInputData",
+        "columnToMatchOn": "LinkedInHandle",
+        "options": {}
+      },
+      "id": "e1f9647c-5583-4a79-8d44-8d357a9bc24f",
+      "name": "Update Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2960,
+        340
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "6ObYJ2xaPfnf8u8f",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const raw = item.json.Location || '';\n  const m = raw.match(/^(.*?)(?:\\s+(\\d[\\d,]+)\\s+followers)?$/i);\n  item.json.Location  = m && m[1] ? m[1].trim() : raw.trim();\n  item.json.Followers = m && m[2] ? m[2].replace(/,/g, '') : '';\n}\nreturn $input.all();\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2780,
+        180
+      ],
+      "id": "3986f9f8-6072-49f6-bf93-d0e99f015053",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "LinkedInHandle",
+              "value": "={{ $('Keep meta').item.json.meta.linkedIn }}"
+            },
+            {
+              "name": "row_number",
+              "value": "={{ $('Keep meta').item.json.row_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "37472e73-fd6d-49c2-a005-22d7b5d87c47",
+      "name": "Restore meta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        2600,
+        340
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rows": {
+      "main": [
+        [
+          {
+            "node": "Keep meta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep meta": {
+      "main": [
+        [
+          {
+            "node": "Fetch LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Data": {
+      "main": [
+        [
+          {
+            "node": "Restore meta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Update Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore meta": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "05a15256-46b8-4377-9267-c4b36073c611",
+  "meta": {
+    "instanceId": "75621fdfdbc812253ee282ac59d7941851620afa73e2e6641899ae5c07fe9495"
+  },
+  "id": "gGrW0OsvN97swDDU",
+  "tags": []
+}
