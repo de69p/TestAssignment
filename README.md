@@ -33,3 +33,6 @@
    - `LinkedInHandle`
    - `Company Name`, `Industry`, `Location`, `Followers`, `Website`, `Company Size`, `Specialties`, `Headquarters`
 4. Збережіть і запустіть **Manual Trigger**.
+
+## Посилання на відео:
+`https://drive.google.com/file/d/1g5hI_bA1T8OtdUCCDIviDaCGmjL1ku-F/view?usp=sharing`
