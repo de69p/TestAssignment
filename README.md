@@ -36,3 +36,6 @@
 
 ## Посилання на відео:
 `https://drive.google.com/file/d/1g5hI_bA1T8OtdUCCDIviDaCGmjL1ku-F/view?usp=sharing`
+
+## Посилання на Google Sheet:
+`https://docs.google.com/spreadsheets/d/1iMw70WQrUXUmRyvyj2r2xGMtyDLNqFt2C2y7_6fFMb8/edit?usp=sharing`
