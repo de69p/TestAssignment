@@ -25,7 +25,7 @@
 8. **Update Row** — оновлює Google Sheets за номером рядка, не створюючи нових рядків.
 
 ## Встановлення
-1. Імпортуйте JSON цього воркфлоу у ваш n8n (*Import → Paste JSON*).
+1. Імпортуйте JSON цього воркфлоу у ваш n8n (*Import from File...*).
 2. Налаштуйте креденшли:
    - **Google Service Account**: доступ до Google Sheets API.
    - **Header Auth**: токени або cookies для LinkedIn.
